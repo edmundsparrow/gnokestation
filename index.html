@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="application-name" content="webdesktop by edmundsparrow">
+    <meta name="description" content="webdesktop by edmundsparrow - Your Alternative Desktop Experience">
+    <meta name="author" content="edmundsparrow">
+    <meta name="theme-color" content="#667eea">
+    <title>webdesktop by edmundsparrow</title>
+    <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+    <link rel="icon" type="image/png" href="assets/favicon.png">
+    <style>
+        /* --- Styles for the Boot Screen --- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            color: white;
+            /* Add transition for the fade-out effect */
+            transition: opacity 0.5s ease-in-out;
+        }
+
+        /* NEW: Class for the redirect fade-out effect */
+        body.fade-out {
+            opacity: 0;
+        }
+
+        .boot-container {
+            text-align: center;
+            max-width: 500px;
+            padding: 40px;
+            /* Initially hidden to be revealed after the page loads */
+            display: none; 
+        }
+
+        /* Show the boot container only if the license popup is not yet active */
+        body:not(.boot-completed) .boot-container {
+            display: block;
+        }
+
+        .system-name {
+            font-size: 2.5rem;
+            font-weight: 300;
+            margin-bottom: 10px;
+            opacity: 0;
+            animation: fadeInUp 1s ease-out 0.5s forwards;
+        }
+
+        .tagline {
+            font-size: 1.1rem;
+            opacity: 0.8;
+            margin-bottom: 40px;
+            opacity: 0;
+            animation: fadeInUp 1s ease-out 1s forwards;
+        }
+
+        .boot-status {
+            margin-bottom: 30px;
+            opacity: 0;
+            animation: fadeInUp 1s ease-out 1.5s forwards;
+        }
+
+        .status-text {
+            font-size: 0.95rem;
+            margin-bottom: 20px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .progress-container {
+            width: 300px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 2px;
+            margin: 0 auto;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            width: 0%;
+            height: 100%;
+            background: linear-gradient(90deg, #4CAF50, #81C784);
+            border-radius: 2px;
+            transition: width 0.3s ease;
+            animation: progressGlow 2s ease-in-out infinite;
+        }
+
+        .boot-steps {
+            margin-top: 30px;
+            opacity: 0;
+            animation: fadeInUp 1s ease-out 2s forwards;
+        }
+
+        .step {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 8px 0;
+            font-size: 0.85rem;
+            opacity: 0.6;
+        }
+
+        .step.active {
+            opacity: 1;
+            color: #81C784;
+        }
+
+        .step-icon {
+            margin-right: 8px;
+            font-size: 1rem;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes progressGlow {
+            0%, 100% { box-shadow: 0 0 5px rgba(129, 199, 132, 0.5); }
+            50% { box-shadow: 0 0 20px rgba(129, 199, 132, 0.8); }
+        }
+        
+        /* --- Styles for Main Content (Placeholder) --- */
+        #desktop {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: calc(100% - 40px); /* Height of the viewport minus taskbar */
+            background-color: transparent; /* Assuming the body background shows through */
+            z-index: 1;
+        }
+
+        #taskbar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 40px;
+            background-color: rgba(0, 0, 0, 0.5); /* Placeholder taskbar style */
+            z-index: 10;
+        }
+    </style>
+</head>
+<body>
+
+<div id="license-popup" style="
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.95);
+    color: white;
+    font-family: 'Segoe UI', sans-serif;
+    display: none; /* Start hidden */
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    z-index: 99999;
+    padding: 20px;
+">
+    <div style="max-width: 500px;">
+        <h1>Notice</h1>
+        <p style="font-size:16px; line-height:1.5;">
+            This page is licensed under the <a href="/license" target="_blank" style="color:#76c7ff; text-decoration:underline;">GNU General Public License v3.0 (GPLv3)</a>.
+        </p>
+        <p style="margin-top:20px; font-size:14px;">
+            <label style="cursor:pointer;">
+                <input type="checkbox" id="accept-license" style="margin-right:8px;"> I have read and accept the license
+            </label>
+        </p>
+        <button id="continue-btn" disabled style="
+            margin-top:15px;
+            padding:8px 16px;
+            font-size:14px;
+            cursor:pointer;
+            border:none;
+            border-radius:6px;
+            background: linear-gradient(135deg, #3a6ea5, #764ba2);
+            color:white;
+        ">Continue</button>
+    </div>
+</div>
+
+<div id="desktop" style="display:none; text-align:center; padding-top:100px;">
+    <h1>Webdesktop Loaded!</h1>
+    <p>This is the main desktop area.</p>
+</div>
+<div id="taskbar" style="display:none;">
+    </div>
+<div class="boot-container">
+    <h1 class="system-name">webdesktop by edmundsparrow</h1>
+    <p class="tagline">Your Alternative Desktop Experience</p>
+    
+    <div class="boot-status">
+        <div class="status-text" id="statusText">Initializing system...</div>
+        <div class="progress-container">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+    </div>
+    
+    <div class="boot-steps">
+        <div class="step" id="step1">
+            <span class="step-icon">⚡</span>
+            <span>Loading core services</span>
+        </div>
+        <div class="step" id="step2">
+            <span class="step-icon">🖥️</span>
+            <span>Initializing desktop environment</span>
+        </div>
+        <div class="step" id="step3">
+            <span class="step-icon">📦</span>
+            <span>Loading applications</span>
+        </div>
+        <div class="step" id="step4">
+            <span class="step-icon">🎨</span>
+            <span>Preparing user interface</span>
+        </div>
+        <div class="step" id="step5">
+            <span class="step-icon">✅</span>
+            <span>Ready to launch</span>
+        </div>
+    </div>
+</div>
+<script>
+// --- License Pop-up Script (MODIFIED for Redirect) ---
+document.addEventListener('DOMContentLoaded', function() {
+    const popup = document.getElementById('license-popup');
+    const checkbox = document.getElementById('accept-license');
+    const continueBtn = document.getElementById('continue-btn');
+    const bootContainer = document.querySelector('.boot-container');
+
+    // Enable continue button when checkbox checked
+    checkbox.addEventListener('change', function() {
+        continueBtn.disabled = !checkbox.checked;
+    });
+
+    // Handle Continue Click: Fade out and Redirect
+    continueBtn.addEventListener('click', function() {
+        // Hide the popup first (optional, but cleaner)
+        popup.style.display = 'none';
+
+        // Add the fade-out class to the body
+        document.body.classList.add('fade-out');
+
+        // Wait for the transition (0.5s) to complete, then redirect
+        setTimeout(() => {
+            window.location.href = "main.html";
+        }, 500); 
+    });
+
+    // --- Boot Sequence Script (Modified) ---
+    const bootSteps = [
+        { text: "Initializing system...", duration: 1000, progress: 15 },
+        { text: "Loading core services...", duration: 800, progress: 30 },
+        { text: "Starting desktop environment...", duration: 1200, progress: 50 },
+        { text: "Loading applications...", duration: 1000, progress: 70 },
+        { text: "Preparing user interface...", duration: 800, progress: 85 },
+        { text: "Almost ready...", duration: 600, progress: 95 },
+        { text: "Boot sequence complete. User Notice pending...", duration: 1000, progress: 100 }
+    ];
+
+    let currentStep = 0;
+    const statusText = document.getElementById('statusText');
+    const progressBar = document.getElementById('progressBar');
+
+    function runBootSequence() {
+        if (currentStep >= bootSteps.length) {
+            // BOOT COMPLETE - HIDE BOOT SCREEN AND SHOW POPUP
+            bootContainer.style.display = 'none';
+            document.body.classList.add('boot-completed'); 
+            popup.style.display = 'flex'; // Show the license popup
+            return;
+        }
+
+        const step = bootSteps[currentStep];
+        statusText.textContent = step.text;
+        progressBar.style.width = step.progress + '%';
+
+        // Activate corresponding step indicator
+        const stepEl = document.getElementById(`step${currentStep + 1}`);
+        if (stepEl) {
+            stepEl.classList.add('active');
+        }
+
+        currentStep++;
+        setTimeout(runBootSequence, step.duration);
+    }
+
+    // Start boot sequence after page loads
+    window.addEventListener('load', () => {
+        setTimeout(runBootSequence, 2000);
+    });
+
+    // Add some interactivity to skip boot
+    document.addEventListener('click', () => {
+        if (currentStep < bootSteps.length) {
+            currentStep = bootSteps.length - 1;
+            statusText.textContent = "Fast boot enabled, showing notice...";
+            progressBar.style.width = '100%';
+            
+            // Activate all steps
+            for (let i = 1; i <= 5; i++) {
+                const stepEl = document.getElementById(`step${i}`);
+                if (stepEl) stepEl.classList.add('active');
+            }
+
+            // Immediately call the function to complete the boot and show the popup
+            setTimeout(runBootSequence, 500); 
+        }
+    });
+});
+</script>
+</body>
+</html>

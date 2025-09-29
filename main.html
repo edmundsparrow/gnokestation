@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebDesktop</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div id="desktop">
+        <div id="windows-container"></div>
+    </div>
+
+    <div id="taskbar">
+        <button class="start-button" id="start-btn">
+            <span>⊞</span> Start
+        </button>
+        <div class="taskbar-items" id="taskbar-items"></div>
+        <div class="clock" id="clock">--:--</div>
+    </div>
+
+    <!-- Core system files (load first) -->
+    <script src="core/event-bus.js"></script>
+    <script src="core/window-manager.js"></script>
+    <script src="core/app-registry.js"></script>
+    <script src="core/desktop.js"></script>
+    <script src="core/taskbar.js"></script>
+    <script src="core/main.js"></script>
+    <script src="core/keypad-inject.js"></script>
+    <script src="core/display.js"></script>
+
+    <!-- Core documentation service (part of system core) -->
+    <script src="core/apps/docs.js"></script>
+
+    <!-- User app loader (loads user apps including about.js) -->
+    <script src="core/apps/app-loader.js"></script>
+    <script src="core/desktop-icons.js"></script>
+    <script src="core/start-menu.js"></script>
+    <script src="core/apps/programs.js"></script>
+</body>
+</html>
