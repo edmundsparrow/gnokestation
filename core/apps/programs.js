@@ -4,10 +4,27 @@
         // App catalog - these are the available apps that can be installed
         appCatalog: [
             // Existing Apps
-            {
+                   // Existing Apps
+        {
+            id: 'recipe',
+            name: 'Recipe Browser',
+            size: '22KB',
+            category: 'food',
+            url: 'system/store/recipe.js',
+            description: 'Browse and search recipes from around the world'
+            },
+        {
+    id: 'crypto',
+    name: 'Crypto Dashboard',
+    size: '26KB',
+    category: 'finance',
+    url: 'system/store/crypto.js',
+    description: 'Track cryptocurrency prices, market trends in real time.'
+},
+        {
                 id: 'wled',
                 name: 'WLED Controller',
-                size: '24KB',
+                size: '33KB',
                 category: 'IoT',
                 url: 'system/store/wled.js',
                 description: 'Control WLED-compatible LED strips with real-time effects'
