@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="application-name" content="Unity Station">
-    <meta name="description" content="Unity Station - The Ultra-Lightweight Industrial Desktop Environment">
-    <meta name="author" content="Ekong Ikpe">
+    <meta name="application-name" content="Gnoke Station">
+    <meta name="description" content="Gnoke Station - The Ultra-Lightweight Industrial Desktop Environment by edmundsparrow">
+    <meta name="author" content="Ekong Ikpe (edmundsparrow)">
     <meta name="theme-color" content="#667eea">
-    <title>Unity Station</title>
+    <title>Gnoke Station</title>
     <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
     <link rel="icon" type="image/png" href="assets/favicon.png">
     <style>
@@ -54,6 +54,14 @@
             opacity: 0;
             margin-bottom: 40px;
             animation: fadeInUp 1s ease-out 1s forwards;
+        }
+
+        .creator {
+            font-size: 0.9rem;
+            opacity: 0;
+            margin-bottom: 30px;
+            color: rgba(255, 255, 255, 0.8);
+            animation: fadeInUp 1s ease-out 1.3s forwards;
         }
 
         .boot-status {
@@ -161,8 +169,9 @@
 
 <!-- Boot Screen -->
 <div class="boot-container">
-    <h1 class="system-name">Unity Station</h1>
+    <h1 class="system-name">Gnoke Station</h1>
     <p class="tagline">The Ultra-Lightweight Industrial Desktop Environment</p>
+    <p class="creator">A WebDesktop by edmundsparrow</p>
     
     <div class="boot-status">
         <div class="status-text" id="statusText">Initializing system...</div>
@@ -173,7 +182,7 @@
     
     <div class="boot-steps">
         <div class="step" id="step1"><span class="step-icon">⚡</span><span>Loading core services</span></div>
-        <div class="step" id="step2"><span class="step-icon">🖥️</span><span>Initializing Unity Station desktop</span></div>
+        <div class="step" id="step2"><span class="step-icon">🖥️</span><span>Initializing Gnoke Station desktop</span></div>
         <div class="step" id="step3"><span class="step-icon">📦</span><span>Loading applications</span></div>
         <div class="step" id="step4"><span class="step-icon">🎨</span><span>Preparing user interface</span></div>
         <div class="step" id="step5"><span class="step-icon">✅</span><span>Ready to launch</span></div>
@@ -200,7 +209,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const bootSteps = [
         { text: "Initializing system...", duration: 1000, progress: 15 },
         { text: "Loading core services...", duration: 800, progress: 30 },
-        { text: "Starting Unity Station desktop...", duration: 1200, progress: 50 },
+        { text: "Starting Gnoke Station desktop...", duration: 1200, progress: 50 },
         { text: "Loading applications...", duration: 1000, progress: 70 },
         { text: "Preparing user interface...", duration: 800, progress: 85 },
         { text: "Almost ready...", duration: 600, progress: 95 },
@@ -247,6 +256,4 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 </body>
 </html>
-
-
     
