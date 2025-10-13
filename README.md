@@ -2,6 +2,7 @@
 
 **Ultra-Lightweight Industrial Interface Platform**
 Complete desktop environment in just **700KB** – designed for industrial HMIs, controllers, and embedded systems.
+**Crucially, it is **mobile and tablet friendly by design**, built on standard web technologies to avoid the complexity and overhead often associated with traditional C++ or embedded interface solutions.
 
 *A WebDesktop by edmundsparrow*
 
