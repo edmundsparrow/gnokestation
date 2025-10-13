@@ -1,8 +1,20 @@
-/* ========================================
- * FILE: core/apps/about.js
- * PURPOSE: About/Documentation viewer app (USER APPLICATION)
- * DEPENDENCIES: Docs service, WindowManager, AppRegistry
- * ======================================== */
+/*
+ * Gnokestation Shell
+ * Copyright (C) 2025 Ekong Ikpe <ekongmikpe@gmail.com>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 window.AboutApp = {
     currentWindow: null,
@@ -12,7 +24,6 @@ window.AboutApp = {
         const content = this.createContent();
         this.currentWindow = window.WindowManager.createWindow('About System', content, 600, 450);
 
-        // --- NEW: Display the general project info (README link) on open ---
         this.showProjectInfo();
         // ------------------------------------------------------------------
 
@@ -69,8 +80,7 @@ window.AboutApp = {
         `;
     },
 
-    // --- NEW METHOD TO DISPLAY GENERAL PROJECT INFORMATION ---
-    showProjectInfo() {
+        showProjectInfo() {
         if (!this.currentWindow) return;
         const detailsDiv = this.currentWindow.querySelector('#app-details');
         
@@ -78,15 +88,18 @@ window.AboutApp = {
         detailsDiv.innerHTML = `
             <div style="padding: 0; border-bottom: 1px solid #eee; margin-bottom: 20px;">
                 <h1 style="margin: 0; color: #343a40;">Gnoke-Station Project Info</h1>
+                <p style="color: #7f8c8d; font-size: 14px; margin-top: 5px;">
+                    One familiar desktop interface for all devices.
+                </p>
             </div>
             
             <div style="margin-bottom: 20px; padding: 0;">
                 <h3 style="color:#495057; margin-bottom: 10px;">Project Overview</h3>
                 <p style="color:#666; line-height:1.6; text-align: justify;">
-                    Gnoke-Station is a lightweight browser-based interface designed to be a consistent and extendable desktop environment for all devices with a modern browser.
+                    Gnoke-Station is an **ultra-lightweight, browser-based interface** designed as a consistent and extendable desktop environment for all devices with a modern browser. It's an ideal, cost-effective UI solution for screens on IoT devices, kiosks, and low-power hardware.
                 </p>
                 <p style="color:#666; line-height:1.6; margin-top: 10px; text-align: justify;">
-                    It aims to provide a unified, minimal UI layer for screens on IoT devices, kiosks, and low-power hardware.
+                    Crucially, it is **mobile and tablet friendly by design**, built on standard web technologies to avoid the complexity and overhead often associated with traditional C++ or embedded interface solutions.
                 </p>
             </div>
 
@@ -118,8 +131,7 @@ window.AboutApp = {
             </div>
         `;
     },
-    // ------------------------------------------------------------------
-
+    
     setupEventHandlers() {
         // ... (rest of setupEventHandlers remains the same)
         if (!this.currentWindow || !this.docsReady) return;

@@ -1,7 +1,25 @@
+/*
+ * Gnokestation Shell
+ * Copyright (C) 2025 Ekong Ikpe <ekongmikpe@gmail.com>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 /* ========================================
  * FILE: core/app-loader.js
  * PURPOSE: Dynamic user application loader
- * DEPENDENCIES: Core system (WebDesktop, AppRegistry)
+ * DEPENDENCIES: Core system (Gnokestation, AppRegistry)
  * ======================================== */
 
 window.AppLoader = {
@@ -13,12 +31,12 @@ window.AppLoader = {
     "core/apps/menu.js",
     "core/apps/about.js",
     "system/clock.js",
-    "system/news.js",
     "core/apps/desktop-settings.js",
     "system/weather.js",
     "core/apps/store.js",
+    "system/raspberry-pi.js",
     "system/calculator.js",
-    "core/apps/readme.js"
+    "system/store/geo-compass.js"
     ],
     
     // Initialize app loading after system is ready

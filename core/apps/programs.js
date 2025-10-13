@@ -1,23 +1,150 @@
-// programs.js - Third-party App Manager for WebDesktop
+/*
+ * Gnokestation Shell
+ * Copyright (C) 2025 Ekong Ikpe <ekongmikpe@gmail.com>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+// programs.js - Third-party App Manager for Gnokestation
 (function() {
     window.ProgramLoader = {
         // App catalog - these are the available apps that can be installed
         appCatalog: [
-            // Existing Apps
-                   // Existing Apps
+ /*
+     
+     {
+  id: 'geo-compass',
+  name: 'Geo Compass',
+  size: '22KB',
+  category: 'oob',
+  url: 'system/store/geo-compass.js',
+  description: 'Digital compass for precise directional navigation and orientation'
+},
+ 
+ */
+       {
+    id: 'vibrationmon',
+    name: 'Vibration Monitor HMI',
+    size: '42KB',
+    category: 'hal',
+    url: 'system/store/vibration-monitor.js',
+    description: 'Touch interface for real-time vibration monitoring and machine diagnostics with waveform display and alert system'
+},
+{
+  id: 'psmmonitor',
+  name: 'PSM Monitor HMI',
+  size: '22KB',
+  category: 'hal',
+  url: 'system/store/psm-monitor.js',
+  description: 'Touch interface for real-time Process Safety Management monitoring and diagnostics with alert system'
+},
+       {
+   id: 'car-hmi',
+            name: 'Car HMI',
+            size: '32KB',
+            category: 'hal',
+            url: 'system/store/car-hmi.js',
+            description: 'Touch interface for vehicle diagnostics and dashboard controls'
+         },
+   {
+    id: 'powerdb',
+    name: 'Power Distribution Board HMI',
+    size: '48KB',
+    category: 'hal',
+    url: 'system/store/powerdb.js',
+    description: 'Interactive touch interface for monitoring and controlling power distribution with breakers, meters, and emergency stop'
+},
+       {
+            id: 'keypad',
+            name: 'Keypad',
+             size: '16KB',
+             category: 'oob',
+             url: 'system/keypad.js',
+             description: 'On screen keyboard for basic inouts'
+           },
         {
-            id: 'recipe',
-            name: 'Recipe Browser',
-            size: '22KB',
-            category: 'food',
-            url: 'system/store/recipe.js',
-            description: 'Browse and search recipes from around the world'
-            },
+            id: 'solar-hmi',
+            name: 'Solar HMI',
+            size: '28KB',
+            category: 'hal',
+            url: 'system/store/solar-hmi.js',
+            description: 'Touch interface for monitoring and controlling solar power systems'
+         },
+      {
+            id: 'mini-routers',
+            name: 'Mini Routers',
+             size: '14KB',
+             category: 'network',
+             url: 'system/store/mini-routers.js',
+             description: 'Multi-vendor network device controller with vendor-specific API configurations'
+           },
+        {
+            id: 'cisco-router',
+            name: 'Cisco Router',
+             size: '13KB',
+             category: 'network-controller',
+             url: 'system/store/cisco-router.js',
+             description: 'Cisco router network controller'
+    },
+  {
+            id: 'irrigation',
+            name: 'Irrigation',
+             size: '13KB',
+             category: 'Marine',
+             url: 'system/store/irrigation.js',
+             description: 'Agro irrigation controller'
+    },
+        {
+             id: 'fleet-tracker',
+             name: 'Fleet Tracker',
+             size: '45KB',
+             category: 'hal',
+             url: 'system/store/fleet-tracker.js',
+             description: 'Professional GPS fleet tracking dashboard with real-time monitoring, trip history, and alerts (Demo UI)'
+         },
+              
+        { 
+            id: 'fleet-monitor',
+            name: 'Fleet Monitor',
+            size: '45KB', // Added standard property
+            category: 'Business', // Added standard property
+            url: 'system/store/fleet-monitor.js', // Added essential property
+            author: 'Gnokestation',
+            description: 'Real-time fleet tracking and monitoring'
+        },
+        {
+            id: 'rssnews',
+            name: 'RSS FEEDS',
+            size: '18.1KB',
+            category: 'News',
+            url: 'system/store/rssnews.js',
+            description: 'Multi-source RSS news reader with regional feeds'
+        },            
+        {
+            id: 'hue', // Added ID for system use
+            name: 'Hue Controller',
+            size: '30KB', // Estimated size
+            category: 'IoT', // Categorized as IoT
+            url: 'system/store/hue.js', // App script path
+            author: 'edmundsparrow',
+            description: 'Control Philips Hue lights on your network'
+        },
         {
     id: 'crypto',
     name: 'Crypto Dashboard',
     size: '26KB',
-    category: 'finance',
+    category: 'Finance',
     url: 'system/store/crypto.js',
     description: 'Track cryptocurrency prices, market trends in real time.'
 },
@@ -28,14 +155,6 @@
                 category: 'IoT',
                 url: 'system/store/wled.js',
                 description: 'Control WLED-compatible LED strips with real-time effects'
-            },
-            {
-                id: 'notepad',
-                name: 'Notepad',
-                size: '21KB',
-                category: 'Productivity',
-                url: 'system/store/notepad.js',
-                description: 'Simple text editor with file save/load capabilities. limited edition'
             },
             {
                 id: 'aquarium',
@@ -52,30 +171,6 @@
                 category: 'Productivity',
                 url: 'system/store/calendar.js',
                 description: 'A standard calendar application.'
-            },
-            {
-                id: 'cloud-storage',
-                name: 'Cloud Storage',
-                size: '15.19 KB',
-                category: 'System',
-                url: 'system/store/cloud-storage.js',
-                description: 'Interface for accessing cloud storage services. Under Development.'
-            },
-            {
-                id: 'contacts',
-                name: 'Contacts',
-                size: '18.16 KB',
-                category: 'Productivity',
-                url: 'system/store/contacts.js',
-                description: 'Address book and contact management tool.'
-            },
-            {
-                id: 'gallery',
-                name: 'Gallery',
-                size: '15.13 KB',
-                category: 'Media',
-                url: 'system/store/gallery.js',
-                description: 'Viewer for images and media.'
             },
             {
                 id: 'gpio',
@@ -102,14 +197,6 @@
                 description: 'Central control interface for smart home devices.'
             },
             {
-                id: 'itel',
-                name: 'iTel Utility',
-                size: '17.77 KB',
-                category: 'Utility',
-                url: 'system/store/itel.js',
-                description: 'Specific utility application (iTel branded or similar). Under Development'
-            },
-            {
                 id: 'odroid',
                 name: 'ODROID Utility',
                 size: '59.74 KB',
@@ -125,14 +212,30 @@
                 url: 'system/store/samsung-tv.js',
                 description: 'Remote control and management for a Samsung smart TV.'
             },
+      {
+            id: 'gnoke-tracker',
+            name: 'Gnoke Tracker',
+            size: '24KB',
+            category: 'monitoring',
+            url: 'system/store/gnoke-tracker.js',
+            description: 'Real-time asset and fleet tracking dashboard'
+        },
             {
-                id: 'sysinfo',
-                name: 'System Info',
-                size: '3.29 KB',
-                category: 'System',
-                url: 'system/store/sysinfo.js',
-                description: 'Displays detailed information about the browser system and hardware.'
-            }
+            id: 'gnoke-pad',
+            name: 'GnokePad',
+            size: '18KB',
+            category: 'productivity',
+            url: 'system/store/gnokepad.js',
+            description: 'Lightweight digital notebook for quick notes and memos'
+        },
+        {
+            id: 'gnoke-viewer',
+            name: 'Gnoke Viewer',
+            size: '20KB',
+            category: 'oob',
+            url: 'system/store/gnoke-viewer.js',
+            description: 'Lightweight monitoring viewer for assets and devices'
+        }
         ],
 
         installedApps: new Set(),
@@ -316,7 +419,7 @@
             console.log('Loaded scripts:', Array.from(this.loadedScripts));
             console.log('Stats:', this.getStats());
             return this.getStats();
-        }
+        },
     };
 
     // Auto-initialize when DOM is ready

@@ -1,6 +1,24 @@
+/*
+ * Gnokestation Shell
+ * Copyright (C) 2025 Ekong Ikpe <ekongmikpe@gmail.com>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 /* ========================================
  * FILE: system/terminal.js
- * PURPOSE: Simple Terminal app for WebDesktop
+ * PURPOSE: Simple Terminal app for Gnokestation
  * DEPENDENCIES: AppRegistry, WindowManager
  * ======================================== */
 
@@ -30,7 +48,7 @@ window.TerminalApp = {
         this.outputEl = win.querySelector("#terminal-output");
         this.inputEl = win.querySelector("#terminal-input");
 
-        this.print("WebDesktop Terminal v1.0");
+        this.print("Gnokestation Terminal v1.0");
         this.print("Type 'help' to see available commands.\n");
 
         this.inputEl.addEventListener("keydown", (e) => {
@@ -92,7 +110,7 @@ window.TerminalApp = {
                 break;
 
             case "about":
-                this.print("WebDesktop Terminal");
+                this.print("Gnokestation Terminal");
                 this.print(`Version: 1.0`);
                 this.print(`Time: ${new Date().toLocaleString()}`);
                 break;
