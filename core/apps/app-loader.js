@@ -30,13 +30,10 @@ window.AppLoader = {
     appScripts: [
     "core/apps/menu.js",
     "core/apps/about.js",
-    "system/clock.js",
+    "core/apps/terminal.js",
     "core/apps/desktop-settings.js",
-    "system/weather.js",
-    "core/apps/store.js",
-    "system/raspberry-pi.js",
-    "system/calculator.js",
-    "system/store/geo-compass.js"
+    // "html/plugins/wallpaper.js",
+    //  "html/plugins/gnokeai.js"
     ],
     
     // Initialize app loading after system is ready

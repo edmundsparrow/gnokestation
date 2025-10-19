@@ -1,9 +1,12 @@
 /*
  * Gnokestation Shell - Terminal with Enhanced Favicon Support
- * Fixed to properly display website favicons on desktop icons
+ * Persistence added using localStorage.
  */
 
 window.TerminalApp = {
+    // 🔹 NEW: Key for localStorage
+    _STORAGE_KEY: 'gnokestation_installed_urls',
+
     open() {
         const termHTML = `
             <div class="terminal-container" style="
@@ -29,7 +32,7 @@ window.TerminalApp = {
         this.outputEl = win.querySelector("#terminal-output");
         this.inputEl = win.querySelector("#terminal-input");
 
-        this.print("WebDesktop Terminal v1.1 (Enhanced Favicon Support)");
+        this.print("WebDesktop Terminal v1.1 (Enhanced Favicon Support, Persistence)");
         this.print("Type 'help' to see available commands.\n");
 
         this.inputEl.addEventListener("keydown", (e) => {
@@ -76,36 +79,21 @@ window.TerminalApp = {
         }
     },
 
-    // 🔹 ENHANCED: Multiple favicon services with fallback
     _faviconFor(url) {
         try {
             const u = new URL(url);
             const domain = u.hostname;
-            
-            // Strategy: Try multiple favicon services in order of reliability
-            // Return a data URI that will attempt multiple sources
             return this._createFaviconDataUrl(domain, url);
         } catch (e) {
             return null;
         }
     },
 
-    // 🔹 NEW: Create a robust favicon data URL with fallback logic
     _createFaviconDataUrl(domain, fullUrl) {
-        // Create an SVG that tries to load the favicon, with fallback to letter icon
-        const firstLetter = domain.charAt(0).toUpperCase();
-        const colorHash = this._stringToColor(domain);
-        
-        // We'll use Google's favicon service as primary, with fallback to direct domain favicon
         const googleFavicon = `https://www.google.com/s2/favicons?domain=${domain}&sz=64`;
-        const directFavicon = `${new URL(fullUrl).origin}/favicon.ico`;
-        
-        // Return the Google favicon URL directly - it's the most reliable
-        // The desktop icon renderer will handle it as an image source
         return googleFavicon;
     },
 
-    // 🔹 NEW: Generate a color from domain string for fallback icons
     _stringToColor(str) {
         let hash = 0;
         for (let i = 0; i < str.length; i++) {
@@ -115,12 +103,40 @@ window.TerminalApp = {
         return `hsl(${hue}, 65%, 50%)`;
     },
 
-    // 🔹 NEW: Create fallback SVG icon with domain initial
     _createFallbackIcon(domain) {
         const letter = domain.charAt(0).toUpperCase();
         const color = this._stringToColor(domain);
         
         return `data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 48 48'><rect width='48' height='48' rx='8' fill='${encodeURIComponent(color)}'/><text x='24' y='32' text-anchor='middle' font-size='24' font-weight='bold' fill='white' font-family='Arial'>${letter}</text></svg>`;
+    },
+    
+    // 🔹 NEW: Function to recreate the AppRegistry object from a stored URL
+    _recreateAppEntry(url) {
+        let id, name, icon, handler, urlForIframe = url;
+
+        try {
+            const u = new URL(url);
+            urlForIframe = u.href;
+            id = this._makeId(u.hostname + (u.pathname || ''));
+            name = this._friendlyNameFromUrlOrPath(u.href);
+            icon = this._faviconFor(u.href) || this._createFallbackIcon(u.hostname);
+        } catch (err) {
+            id = this._makeId(url);
+            name = this._friendlyNameFromUrlOrPath(url);
+            icon = this._createFallbackIcon(id);
+        }
+
+        handler = () => this._createWebAppWindow(name, urlForIframe);
+
+        return {
+            id: id,
+            name: (name || id),
+            icon: icon,
+            handler: handler,
+            singleInstance: false,
+            // 🔹 CRITICAL: Store the URL on the object for later use by uninstall/re-registration
+            url: urlForIframe 
+        };
     },
 
     _createWebAppWindow(appName, url) {
@@ -138,56 +154,102 @@ window.TerminalApp = {
     },
 
     _registerAppObject(appObj) {
+        let registered = false;
         if (window.AppRegistry && typeof window.AppRegistry.registerApp === 'function') {
-            const ok = window.AppRegistry.registerApp(appObj);
-            if (!ok && window.EventBus) {
-                window.EventBus.emit('app-registered', appObj);
-            }
+            registered = window.AppRegistry.registerApp(appObj);
+        } else if (window.AppRegistry && window.AppRegistry.registeredApps instanceof Map) {
+            window.AppRegistry.registeredApps.set(appObj.id, appObj);
+            registered = true;
+        }
+
+        if (registered) {
+            if (window.EventBus) window.EventBus.emit('app-registered', appObj);
             // 🔹 CRITICAL: Force desktop icons refresh
             if (window.DesktopIconManager && typeof window.DesktopIconManager.refreshIcons === 'function') {
                 setTimeout(() => window.DesktopIconManager.refreshIcons(), 100);
             }
-            return ok;
-        } else if (window.AppRegistry && window.AppRegistry.registeredApps instanceof Map) {
-            window.AppRegistry.registeredApps.set(appObj.id, appObj);
-            if (window.EventBus) window.EventBus.emit('app-registered', appObj);
-            if (window.DesktopIconManager && typeof window.DesktopIconManager.refreshIcons === 'function') {
-                setTimeout(() => window.DesktopIconManager.refreshIcons(), 100);
-            }
-            return true;
         }
-        return false;
+        return registered;
     },
 
     _unregisterAppId(appId) {
         if (!window.AppRegistry) return false;
 
+        // 1. Get the app object BEFORE unregistering to find its URL
+        const allApps = (window.AppRegistry.getAllApps 
+            ? window.AppRegistry.getAllApps() 
+            : (window.AppRegistry.registeredApps ? Array.from(window.AppRegistry.registeredApps.values()) : [])
+        );
+        const app = allApps.find(a => a.id === appId);
+
+        let removed = false;
         if (typeof window.AppRegistry.unregisterApp === 'function') {
             try {
                 window.AppRegistry.unregisterApp(appId);
-                if (window.EventBus) {
-                    window.EventBus.emit('app-unregistered', appId);
-                    window.EventBus.emit('display-force-refresh');
-                }
-                return true;
+                removed = true;
             } catch (e) {
                 console.warn('Unregister via API failed:', e);
             }
+        } else if (window.AppRegistry.registeredApps && typeof window.AppRegistry.registeredApps.delete === 'function') {
+            removed = window.AppRegistry.registeredApps.delete(appId);
         }
 
-        if (window.AppRegistry.registeredApps && typeof window.AppRegistry.registeredApps.delete === 'function') {
-            const deleted = window.AppRegistry.registeredApps.delete(appId);
-            if (deleted && window.EventBus) {
+        if (removed) {
+            if (window.EventBus) {
                 window.EventBus.emit('app-unregistered', appId);
                 window.EventBus.emit('display-force-refresh');
             }
-            return deleted;
+            // 🔹 CRITICAL: Remove URL from persistence
+            if (app && app.url) {
+                this._removeInstalledUrl(app.url);
+            }
         }
 
-        return false;
+        return removed;
+    },
+    
+    // ---------------------------------------------------------
+    // 🔹 PERSISTENCE FUNCTIONS
+    // ---------------------------------------------------------
+
+    _loadInstalledUrls() {
+        try {
+            const stored = localStorage.getItem(this._STORAGE_KEY);
+            return stored ? JSON.parse(stored) : [];
+        } catch (e) {
+            console.error("Failed to load installed URLs from localStorage:", e);
+            return [];
+        }
+    },
+
+    _saveInstalledUrls(urls) {
+        try {
+            localStorage.setItem(this._STORAGE_KEY, JSON.stringify(urls));
+        } catch (e) {
+            console.error("Failed to save installed URLs to localStorage:", e);
+        }
+    },
+
+    _addInstalledUrl(url) {
+        const urls = this._loadInstalledUrls();
+        if (!urls.includes(url)) {
+            urls.push(url);
+            this._saveInstalledUrls(urls);
+        }
+    },
+
+    _removeInstalledUrl(url) {
+        let urls = this._loadInstalledUrls();
+        const initialLength = urls.length;
+        // Filter out the specific URL
+        urls = urls.filter(u => u !== url); 
+        if (urls.length !== initialLength) {
+            this._saveInstalledUrls(urls);
+        }
     },
 
     // Commands ------------------------------------------------
+    // 🔹 CRITICAL: THIS SECTION MUST BE COMPLETE FOR COMMANDS TO WORK
 
     runCommand(cmd) {
         if (!cmd) return;
@@ -218,7 +280,8 @@ window.TerminalApp = {
                 if (!apps || apps.length === 0) {
                     this.print("  (none)");
                 } else {
-                    apps.forEach(a => this.print(`  ${a.id} - ${a.name}`));
+                    // Filter out the terminal itself for a cleaner list
+                    apps.filter(a => a.id !== 'terminal').forEach(a => this.print(`  ${a.id} - ${a.name} (${a.url || 'System'})`));
                 }
                 break;
 
@@ -274,69 +337,45 @@ window.TerminalApp = {
                     this.print("Usage: install <url|file-path>");
                     this.print("Examples:");
                     this.print("  install https://www.photopea.com");
-                    this.print("  install http://example.net/myapp.html");
                     this.print("  install github.com (auto-adds https://)");
                     break;
                 }
                 {
                     const input = parts.slice(1).join(' ');
-                    let id = null;
-                    let name = null;
-                    let icon = null;
-                    let handler = null;
                     let urlForIframe = input;
 
+                    // URL resolution logic
                     try {
                         const maybeUrl = (/^[\w\-]+(\.[\w\-]+)+/).test(input) && !/^[a-z]+:\/\//i.test(input)
                             ? ('https://' + input)
                             : input;
-                        const u = new URL(maybeUrl);
-                        urlForIframe = u.href;
-                        id = this._makeId(u.hostname + (u.pathname || ''));
-                        name = this._friendlyNameFromUrlOrPath(u.href);
-                        
-                        // 🔹 ENHANCED: Use improved favicon fetching
-                        icon = this._faviconFor(u.href);
-                        if (!icon) {
-                            icon = this._createFallbackIcon(u.hostname);
-                        }
-                        
-                        handler = () => this._createWebAppWindow(name, urlForIframe);
-                        
-                        this.print(`Resolved URL: ${urlForIframe}`);
-                        this.print(`Favicon URL: ${icon}`);
+                        urlForIframe = new URL(maybeUrl).href;
                     } catch (err) {
-                        urlForIframe = input;
-                        id = this._makeId(input);
-                        name = this._friendlyNameFromUrlOrPath(input);
-                        icon = this._createFallbackIcon(id);
-                        handler = () => this._createWebAppWindow(name, urlForIframe);
-                        
-                        this.print(`Treating as local path: ${urlForIframe}`);
+                        urlForIframe = input; // Treat as local path
+                        this.print(`Treating as local path/unresolved URL: ${urlForIframe}`);
                     }
 
-                    id = id || this._makeId(name);
+                    // Create the app object
+                    const appObj = this._recreateAppEntry(urlForIframe);
+                    const id = appObj.id;
+                    const name = appObj.name;
 
                     const existing = (window.AppRegistry && typeof window.AppRegistry.getAllApps === 'function')
                         ? window.AppRegistry.getAllApps().find(a => a.id === id)
                         : null;
+                        
                     if (existing) {
                         this.print(`App '${id}' already installed as '${existing.name}'.`);
                         break;
                     }
 
-                    const appObj = {
-                        id,
-                        name: (name || id),
-                        icon: icon,
-                        handler,
-                        singleInstance: false
-                    };
-
                     const registered = this._registerAppObject(appObj);
                     if (registered) {
+                        // 🔹 CRITICAL: Persist the URL
+                        this._addInstalledUrl(appObj.url); 
+                        
                         this.print(`✓ App '${appObj.name}' installed successfully as id '${appObj.id}'.`);
-                        this.print(`  Desktop icon should now show website favicon.`);
+                        this.print(`  Desktop icon should now show website favicon and persist on refresh.`);
                     } else {
                         this.print("Failed to register app. AppRegistry unavailable.");
                     }
@@ -350,18 +389,20 @@ window.TerminalApp = {
                 }
                 {
                     const targetId = parts[1];
-                    const removed = this._unregisterAppId(targetId);
+                    // _unregisterAppId handles removal from AppRegistry AND localStorage
+                    const removed = this._unregisterAppId(targetId); 
                     if (removed) {
-                        this.print(`✓ App '${targetId}' uninstalled.`);
+                        this.print(`✓ App '${targetId}' uninstalled and removed from persistence.`);
                     } else {
                         this.print(`App '${targetId}' not found or could not be uninstalled.`);
                     }
                 }
                 break;
-
+                
             case "about":
                 this.print("WebDesktop Terminal");
                 this.print(`Version: 1.1 (Enhanced Favicon Support)`);
+                this.print(`Persistence: Enabled via localStorage`);
                 this.print(`Time: ${new Date().toLocaleString()}`);
                 this.print(`Favicon Service: Google Favicon API`);
                 break;
@@ -377,13 +418,27 @@ window.TerminalApp = {
     }
 };
 
+// ---------------------------------------------------------
+// 🔹 INITIALIZATION BLOCK: Register System App & Load Persisted Apps
+// ---------------------------------------------------------
+
 // Register terminal as system app
 if (window.AppRegistry) {
     window.AppRegistry.registerApp({
         id: "terminal",
         name: "Terminal",
-        icon: "data:image/svg+xml;base64,PHN2ZyBmaWxsPSIjMDBmZjAwIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNMiAyYTIgMiAwIDAgMC0yIDJ2MTRhMiAyIDAgMCAwIDIgMmgxOGEyIDIgMCAwIDAgMi0yVjRhMiAyIDAgMCAwLTItMkgyeiIvPjxwYXRoIGQ9Ik00IDE3bDYtNi02LTYiLz48cGF0aCBkPSJNMTAgMTdoOG0wLTFoOCIvPjwvc3ZnPg==",
+        icon: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='48' height='48'><rect width='48' height='48' rx='4' fill='%231e1e1e'/><path d='M12 16l8 8-8 8M24 30h12' stroke='%234ec9b0' stroke-width='2' fill='none' stroke-linecap='round'/></svg>",
         handler: () => window.TerminalApp.open(),
         singleInstance: false
+    });
+
+    // Load and register persisted web apps on startup
+    const persistedUrls = window.TerminalApp._loadInstalledUrls();
+    persistedUrls.forEach(url => {
+        const appObj = window.TerminalApp._recreateAppEntry(url);
+        // Only register if the ID doesn't conflict with system apps
+        if (appObj.id !== 'terminal') {
+            window.TerminalApp._registerAppObject(appObj);
+        }
     });
 }

@@ -9,7 +9,7 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
@@ -37,13 +37,13 @@
     },
 
     createMenuHTML() {
-      // Get current theme colors or use fallback
-      const primary1 = getComputedStyle(document.documentElement).getPropertyValue('--theme-primary-1').trim() || '#2c5282';
-      const primary2 = getComputedStyle(document.documentElement).getPropertyValue('--theme-primary-2').trim() || '#5b2c82';
-      const bg1 = getComputedStyle(document.documentElement).getPropertyValue('--theme-bg-1').trim() || '#e8e4f3';
-      const bg2 = getComputedStyle(document.documentElement).getPropertyValue('--theme-bg-2').trim() || '#d8d4e8';
-      const bg3 = getComputedStyle(document.documentElement).getPropertyValue('--theme-bg-3').trim() || '#c8c4dd';
-      const accent = getComputedStyle(document.documentElement).getPropertyValue('--theme-accent').trim() || '#5b2c82';
+      // Get current theme colors from CSS variables
+      const primary1 = getComputedStyle(document.documentElement).getPropertyValue('--theme-primary-1').trim() || '#86b4e4';
+      const primary2 = getComputedStyle(document.documentElement).getPropertyValue('--theme-primary-2').trim() || '#3f6e9b';
+      const bg1 = getComputedStyle(document.documentElement).getPropertyValue('--theme-bg-1').trim() || 'rgba(230, 238, 245, 0.95)';
+      const bg2 = getComputedStyle(document.documentElement).getPropertyValue('--theme-bg-2').trim() || 'rgba(230, 238, 245, 0.90)';
+      const bg3 = getComputedStyle(document.documentElement).getPropertyValue('--theme-bg-3').trim() || 'rgba(230, 238, 245, 0.85)';
+      const accent = getComputedStyle(document.documentElement).getPropertyValue('--theme-accent').trim() || '#1F4765';
 
       return `
         <div class="start-menu-app" style="
@@ -53,6 +53,8 @@
           background: linear-gradient(180deg, ${bg1} 0%, ${bg2} 50%, ${bg3} 100%);
           font-family: 'Segoe UI', Arial, sans-serif;
           font-size: 13px;
+          -webkit-font-smoothing: antialiased;
+          -moz-osx-font-smoothing: grayscale;
         ">
           <div class="menu-header" style="
             background: linear-gradient(135deg, ${primary1} 0%, ${primary2} 100%);
@@ -61,23 +63,25 @@
             font-weight: bold;
             font-size: 16px;
             text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+            -webkit-font-smoothing: antialiased;
           ">
             <span>🪟 GnokeStation</span>
           </div>
 
           <div class="menu-search" style="
             padding: 12px 16px;
-            background: rgba(255,255,255,0.5);
+            background: ${bg1};
           ">
             <input type="text" id="start-search" placeholder="Search programs..." style="
               width: 100%;
               padding: 8px 12px;
-              border: 1px solid #ccc;
+              border: 1px solid rgba(0,0,0,0.15);
               border-radius: 4px;
               font-size: 13px;
               outline: none;
               background: white;
               box-sizing: border-box;
+              -webkit-font-smoothing: antialiased;
             ">
           </div>
 
@@ -90,23 +94,37 @@
           "></div>
 
           <div class="menu-footer" style="
-            background: rgba(${this.hexToRgb(accent)}, 0.1);
+            background: ${bg3};
             padding: 8px 16px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            border-top: 1px solid rgba(0,0,0,0.1);
           ">
             <div class="menu-stats" id="start-stats" style="font-size: 10px; color: #666;">
               0 programs available
             </div>
             <div class="view-toggle">
               <button class="toggle-btn active" data-view="categories" style="
-                padding: 4px 8px; font-size: 10px; background: rgba(${this.hexToRgb(accent)}, 0.3);
-                color: white; border: none; cursor: pointer; border-radius: 3px; margin-right: 2px;
+                padding: 4px 8px; 
+                font-size: 10px; 
+                background: ${accent};
+                color: white; 
+                border: none; 
+                cursor: pointer; 
+                border-radius: 3px; 
+                margin-right: 2px;
+                -webkit-font-smoothing: antialiased;
               ">Categories</button>
               <button class="toggle-btn" data-view="all" style="
-                padding: 4px 8px; font-size: 10px; background: transparent;
-                color: ${accent}; border: none; cursor: pointer; border-radius: 3px;
+                padding: 4px 8px; 
+                font-size: 10px; 
+                background: transparent;
+                color: ${accent}; 
+                border: 1px solid ${accent}; 
+                cursor: pointer; 
+                border-radius: 3px;
+                -webkit-font-smoothing: antialiased;
               ">All Programs</button>
             </div>
           </div>
@@ -118,7 +136,7 @@
       const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
       return result ? 
         `${parseInt(result[1], 16)}, ${parseInt(result[2], 16)}, ${parseInt(result[3], 16)}` : 
-        '91, 44, 130';
+        '31, 78, 101';
     },
 
     setupEventHandlers() {
@@ -156,16 +174,18 @@
       this.currentWindow.addEventListener('click', (e) => {
         const toggleBtn = e.target.closest('.toggle-btn');
         if (toggleBtn) {
-          const accent = getComputedStyle(document.documentElement).getPropertyValue('--theme-accent').trim() || '#5b2c82';
+          const accent = getComputedStyle(document.documentElement).getPropertyValue('--theme-accent').trim() || '#1F4765';
           
           this.currentWindow.querySelectorAll('.toggle-btn').forEach(btn => {
             btn.classList.remove('active');
             btn.style.background = 'transparent';
             btn.style.color = accent;
+            btn.style.border = `1px solid ${accent}`;
           });
           toggleBtn.classList.add('active');
-          toggleBtn.style.background = `rgba(${this.hexToRgb(accent)}, 0.3)`;
+          toggleBtn.style.background = accent;
           toggleBtn.style.color = 'white';
+          toggleBtn.style.border = 'none';
           this.viewMode = toggleBtn.dataset.view;
           this.renderApps();
         }
@@ -243,7 +263,8 @@
     },
 
     renderCategoryView(container, apps) {
-      const accent = getComputedStyle(document.documentElement).getPropertyValue('--theme-accent').trim() || '#5b2c82';
+      const accent = getComputedStyle(document.documentElement).getPropertyValue('--theme-accent').trim() || '#1F4765';
+      const bg1 = getComputedStyle(document.documentElement).getPropertyValue('--theme-bg-1').trim() || 'rgba(230, 238, 245, 0.95)';
       const categorized = this.groupAppsByCategory(apps);
       
       if (this.recentApps.length > 0) {
@@ -258,17 +279,18 @@
         const isExpanded = this.expandedCategories.has(categoryId);
 
         html += `
-          <div class="menu-category" style="margin-bottom: 8px; background: rgba(255,255,255,0.3); border-radius: 6px;">
+          <div class="menu-category" style="margin-bottom: 8px; background: white; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
             <div class="category-header" data-category="${categoryId}" style="
               display: flex; align-items: center; padding: 8px 12px;
-              background: rgba(255,255,255,0.6); cursor: pointer; user-select: none;
+              background: ${bg1}; cursor: pointer; user-select: none;
+              border-radius: 6px 6px 0 0;
             ">
               <span style="font-size: 16px; margin-right: 8px;">${category.icon}</span>
               <span style="flex-grow: 1; font-weight: 600; color: ${accent};">${category.name}</span>
               <span style="background: rgba(${this.hexToRgb(accent)}, 0.2); color: ${accent}; padding: 2px 6px; border-radius: 10px; font-size: 10px; margin-right: 6px;">${categoryApps.length}</span>
-              <span style="color: ${accent}; ${isExpanded ? 'transform: rotate(90deg);' : ''}">▶</span>
+              <span style="color: ${accent}; ${isExpanded ? 'transform: rotate(90deg);' : ''} transition: transform 0.2s;">▶</span>
             </div>
-            <div style="${isExpanded ? 'display: block;' : 'display: none;'} padding: 4px; background: rgba(255,255,255,0.2);">
+            <div style="${isExpanded ? 'display: block;' : 'display: none;'} padding: 4px; background: white;">
               ${categoryApps.map(app => this.renderAppItem(app, categoryId === 'recent')).join('')}
             </div>
           </div>
@@ -278,16 +300,17 @@
     },
 
     renderAllView(container, apps) {
-      const accent = getComputedStyle(document.documentElement).getPropertyValue('--theme-accent').trim() || '#5b2c82';
+      const accent = getComputedStyle(document.documentElement).getPropertyValue('--theme-accent').trim() || '#1F4765';
+      const bg1 = getComputedStyle(document.documentElement).getPropertyValue('--theme-bg-1').trim() || 'rgba(230, 238, 245, 0.95)';
       
       const html = `
-        <div class="menu-category" style="margin-bottom: 8px; background: rgba(255,255,255,0.3); border-radius: 6px;">
-          <div style="display: flex; align-items: center; padding: 8px 12px; background: rgba(255,255,255,0.6);">
+        <div class="menu-category" style="margin-bottom: 8px; background: white; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+          <div style="display: flex; align-items: center; padding: 8px 12px; background: ${bg1}; border-radius: 6px 6px 0 0;">
             <span style="font-size: 16px; margin-right: 8px;">📋</span>
             <span style="flex-grow: 1; font-weight: 600; color: ${accent};">All Programs</span>
             <span style="background: rgba(${this.hexToRgb(accent)}, 0.2); color: ${accent}; padding: 2px 6px; border-radius: 10px; font-size: 10px;">${apps.length}</span>
           </div>
-          <div style="padding: 4px; background: rgba(255,255,255,0.2);">
+          <div style="padding: 4px; background: white;">
             ${apps.sort((a, b) => a.name.localeCompare(b.name)).map(app => this.renderAppItem(app)).join('')}
           </div>
         </div>
@@ -297,15 +320,16 @@
 
     renderAppItem(app, isRecent = false) {
       const highlightedName = this.searchQuery ? 
-        app.name.replace(new RegExp(`(${this.searchQuery})`, 'gi'), '<span style="background: yellow;">$1</span>') : 
+        app.name.replace(new RegExp(`(${this.searchQuery})`, 'gi'), '<span style="background: #ffd700;">$1</span>') : 
         app.name;
 
       return `
         <div class="menu-app-item" data-app-id="${app.id}" style="
           display: flex; align-items: center; padding: 6px 8px; margin: 2px 0; border-radius: 4px;
-          cursor: pointer; background: rgba(255,255,255,0.4); ${isRecent ? 'border-left: 3px solid #4caf50;' : ''}
-        " onmouseover="this.style.background='rgba(255,255,255,0.7)'" onmouseout="this.style.background='rgba(255,255,255,0.4)'">
-          <img src="${app.icon}" style="width: 24px; height: 24px; margin-right: 10px; border-radius: 2px;">
+          cursor: pointer; background: white; ${isRecent ? 'border-left: 3px solid #4caf50;' : ''}
+          transition: background 0.15s;
+        " onmouseover="this.style.background='rgba(0,0,0,0.05)'" onmouseout="this.style.background='white'">
+          <img src="${app.icon}" style="width: 24px; height: 24px; margin-right: 10px; border-radius: 2px; image-rendering: -webkit-optimize-contrast; image-rendering: crisp-edges;">
           <div>
             <div style="font-size: 13px; font-weight: 500; color: #333;">${highlightedName}</div>
             <div style="font-size: 10px; color: #666;">${app.description}</div>

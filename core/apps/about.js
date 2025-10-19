@@ -59,7 +59,7 @@ window.AboutApp = {
             <div class="about-container" style="display: flex; height: 100%; font-family: 'Segoe UI', sans-serif;">
                 <div class="sidebar" style="width: 200px; background: #f8f9fa; border-right: 1px solid #dee2e6; display: flex; flex-direction: column;">
                     <div style="padding: 10px; background: #343a40; color: white; text-align: left;">
-                        <h3 style="margin: 0 0 2px 0; font-size: 16px;">Gnoke-Station</h3>
+                        <h3 style="margin: 0 0 2px 0; font-size: 16px;">GnokeStation</h3>
                         <p style="margin: 0; font-size: 12px; opacity: 0.8;">Documentation Browser</p>
                     </div>
                     <div style="padding: 10px;">

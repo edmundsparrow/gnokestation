@@ -9,7 +9,7 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. See the
+ * MERCHANTABILITY and FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
@@ -27,7 +27,7 @@ window.DesktopSettingsApp = {
         iconSize: 'medium',
         iconSpacing: 'normal',
         showLabels: true,
-        doubleClickToOpen: false,
+        // doubleClickToOpen: false, // REMOVED
         layoutMode: 'auto',
         columnsPerRow: 4
     },
@@ -52,7 +52,7 @@ window.DesktopSettingsApp = {
             const settingsToSave = {
                 ...settings,
                 showLabels: Boolean(settings.showLabels),
-                doubleClickToOpen: Boolean(settings.doubleClickToOpen)
+                // doubleClickToOpen: Boolean(settings.doubleClickToOpen) // REMOVED
             };
             
             localStorage.setItem('webos-desktop-settings', JSON.stringify(settingsToSave));
@@ -67,7 +67,6 @@ window.DesktopSettingsApp = {
     open() {
         const settingsHTML = `
             <div style="height:100%;display:flex;font-family:'Segoe UI',sans-serif;background:#f5f5f5;">
-                <!-- Sidebar -->
                 <div style="width:180px;background:linear-gradient(135deg,var(--theme-primary-1,#2c5282),var(--theme-primary-2,#5b2c82));color:white;padding:20px 0;border-right:1px solid rgba(255,255,255,0.1);">
                     <div class="settings-nav active" data-section="theme" style="padding:12px 20px;cursor:pointer;border-left:3px solid white;background:rgba(255,255,255,0.1);font-size:14px;">
                         🎨 Theme
@@ -80,16 +79,13 @@ window.DesktopSettingsApp = {
                     </div>
                 </div>
 
-                <!-- Content -->
                 <div style="flex:1;overflow-y:auto;">
-                    <!-- Theme Section -->
                     <div id="section-theme" class="settings-section" style="padding:20px;">
                         <h2 style="margin:0 0 10px;color:#333;">Theme Settings</h2>
                         <p style="color:#666;margin-bottom:20px;">Customize desktop appearance</p>
                         <div id="theme-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;"></div>
                     </div>
 
-                    <!-- Desktop Section -->
                     <div id="section-desktop" class="settings-section" style="display:none;padding:16px;">
                         <h2 style="margin:0 0 20px 0;text-align:center;color:#2c3e50;">Desktop Settings</h2>
                         
@@ -124,18 +120,6 @@ window.DesktopSettingsApp = {
                         </div>
 
                         <div style="background:white;border-radius:8px;padding:16px;margin-bottom:16px;box-shadow:0 2px 4px rgba(0,0,0,0.1);">
-                            <h3 style="margin-top:0;color:#1976d2;border-bottom:2px solid #1976d2;padding-bottom:8px;">Interaction Behavior</h3>
-                            
-                            <div style="margin:12px 0;padding:12px;background:#f5f5f5;border-radius:6px;">
-                                <label style="display:flex;align-items:center;color:#333;cursor:pointer;">
-                                    <input type="checkbox" id="doubleClickToOpen" style="margin-right:10px;width:18px;height:18px;cursor:pointer;">
-                                    <span style="font-weight:600;">Double-click to open apps</span>
-                                </label>
-                                <p style="margin:8px 0 0 28px;font-size:12px;color:#666;">Single click will just select the icon</p>
-                            </div>
-                        </div>
-
-                        <div style="background:white;border-radius:8px;padding:16px;margin-bottom:16px;box-shadow:0 2px 4px rgba(0,0,0,0.1);">
                             <h3 style="margin-top:0;color:#1976d2;border-bottom:2px solid #1976d2;padding-bottom:8px;">Layout Configuration</h3>
                             
                             <div style="margin:12px 0;">
@@ -158,15 +142,7 @@ window.DesktopSettingsApp = {
                                 </select>
                             </div>
 
-                            <div style="margin-top:12px;padding:12px;background:#e3f2fd;border-left:4px solid #1976d2;border-radius:4px;font-size:13px;color:#1976d2;">
-                                <strong>Layout Modes Explained:</strong><br>
-                                <div style="margin-top:8px;line-height:1.6;">
-                                    • <strong>Auto Detect:</strong> Automatically chooses the best layout based on screen size and orientation<br>
-                                    • <strong>Grid:</strong> Fixed number of columns - consistent positioning across sessions<br>
-                                    • <strong>Adaptive:</strong> Dynamic layout that adjusts when icons don't fit optimally
-                                </div>
                             </div>
-                        </div>
                         
                         <div style="display:flex;gap:12px;margin-top:20px;padding-top:20px;border-top:2px solid #e0e0e0;">
                             <button id="resetSettings" style="flex:1;padding:12px;background:#dc3545;color:white;border:none;border-radius:6px;cursor:pointer;font-size:14px;font-weight:600;">
@@ -179,7 +155,6 @@ window.DesktopSettingsApp = {
                         <div id="statusMessage" style="margin-top:12px;padding:12px;border-radius:6px;font-size:13px;display:none;"></div>
                     </div>
 
-                    <!-- Info Section -->
                     <div id="section-info" class="settings-section" style="display:none;padding:20px;">
                         <h2 style="margin:0 0 10px;color:#333;">Screen Information</h2>
                         <div style="background:white;border-radius:8px;padding:16px;box-shadow:0 2px 4px rgba(0,0,0,0.1);">
@@ -320,14 +295,14 @@ window.DesktopSettingsApp = {
         const iconSize = win.querySelector('#iconSize');
         const iconSpacing = win.querySelector('#iconSpacing');
         const showLabels = win.querySelector('#showLabels');
-        const doubleClick = win.querySelector('#doubleClickToOpen');
+        // const doubleClick = win.querySelector('#doubleClickToOpen'); // REMOVED
         const layoutMode = win.querySelector('#layoutMode');
         const columnsPerRow = win.querySelector('#columnsPerRow');
         
         if (iconSize) iconSize.value = settings.iconSize;
         if (iconSpacing) iconSpacing.value = settings.iconSpacing;
         if (showLabels) showLabels.checked = settings.showLabels;
-        if (doubleClick) doubleClick.checked = settings.doubleClickToOpen;
+        // if (doubleClick) doubleClick.checked = settings.doubleClickToOpen; // REMOVED
         if (layoutMode) layoutMode.value = settings.layoutMode;
         if (columnsPerRow) columnsPerRow.value = settings.columnsPerRow;
         
@@ -373,7 +348,7 @@ window.DesktopSettingsApp = {
             iconSize: win.querySelector('#iconSize').value,
             iconSpacing: win.querySelector('#iconSpacing').value,
             showLabels: win.querySelector('#showLabels').checked,
-            doubleClickToOpen: win.querySelector('#doubleClickToOpen').checked,
+            // doubleClickToOpen: win.querySelector('#doubleClickToOpen').checked, // REMOVED
             layoutMode: win.querySelector('#layoutMode').value,
             columnsPerRow: parseInt(win.querySelector('#columnsPerRow').value)
         };
@@ -384,11 +359,7 @@ window.DesktopSettingsApp = {
             const verification = this.loadSettings();
             console.log('Settings verification after save:', verification);
             
-            if (verification.doubleClickToOpen !== newSettings.doubleClickToOpen) {
-                console.error('CRITICAL: Double-click setting did not save correctly!');
-                this.showStatusMessage(win, 'Error saving double-click setting. Please try again.', 'error');
-                return;
-            }
+            // REMOVED: Double-click verification
             
             if (window.EventBus) {
                 window.EventBus.emit('desktop-settings-updated', newSettings);
@@ -420,7 +391,7 @@ window.DesktopSettingsApp = {
             win.querySelector('#iconSize').value = defaults.iconSize;
             win.querySelector('#iconSpacing').value = defaults.iconSpacing;
             win.querySelector('#showLabels').checked = defaults.showLabels;
-            win.querySelector('#doubleClickToOpen').checked = defaults.doubleClickToOpen;
+            // win.querySelector('#doubleClickToOpen').checked = defaults.doubleClickToOpen; // REMOVED
             win.querySelector('#layoutMode').value = defaults.layoutMode;
             win.querySelector('#columnsPerRow').value = defaults.columnsPerRow;
             
@@ -492,7 +463,7 @@ if (window.AppRegistry) {
                 'Icon size and spacing controls', 
                 'Layout mode selection (auto/grid/adaptive)', 
                 'Show/hide icon labels', 
-                'Click behavior preferences', 
+                // 'Click behavior preferences', // REMOVED
                 'Grid column configuration', 
                 'Screen information display', 
                 'Reset to defaults functionality' 
