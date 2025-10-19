@@ -9,7 +9,7 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
@@ -18,14 +18,18 @@
 
 /* ========================================
  * FILE: core/desktop-icons.js
- * VERSION: 1.0.1 (FIXED)
+ * VERSION: 2.0.0 (SIMPLIFIED - DOUBLE-CLICK DEFAULT)
  * BUILD DATE: 2025-09-29
  *
  * PURPOSE:
- * Manages the display, styling, and user interaction (click/context menu)
- * for all desktop icons visible on the Unity Station desktop surface.
+ * Manages the display, styling, and user interaction for all desktop icons.
+ * Uses natural double-click/tap behavior for launching apps.
  *
- * FIXED: Double-click behavior now works correctly.
+ * CHANGES FROM v1.0.1:
+ * - Removed redundant doubleClickToOpen setting
+ * - Double-click/tap is now the natural default behavior
+ * - Single click selects the icon (standard desktop behavior)
+ * - Cleaner, more intuitive interaction model
  *
  * AUTHOR:
  * Edmundsparrow.netlify.app | whatsappme @ 09024054758 | webaplications5050@gmail.com
@@ -38,7 +42,8 @@ window.DesktopIconManager = {
     systemAppsNoDesktop: new Set(['startmenu', 'taskbar']), 
     settings: {
         showLabels: true,
-        doubleClickToOpen: false,
+        layoutMode: 'auto',
+        columnsPerRow: 4
     },
     initialized: false,
     
@@ -232,6 +237,7 @@ window.DesktopIconManager = {
         let clickCount = 0;
         let clickTimer = null;
         
+        // Standard desktop behavior: single click selects, double-click launches
         icon.addEventListener('click', (e) => {
             e.preventDefault();
             clickCount++;
@@ -240,64 +246,60 @@ window.DesktopIconManager = {
                 clearTimeout(clickTimer);
             }
             
-            const currentSettings = this.getFreshSettings();
-            const doubleClickMode = currentSettings.doubleClickToOpen;
-            
-            console.log('Icon clicked, doubleClickMode:', doubleClickMode, 'clickCount:', clickCount);
-            
             clickTimer = setTimeout(() => {
-                if (clickCount === 1 && !doubleClickMode) {
-                    console.log('Single click launch');
-                    this.launchApp(app);
-                } else if (clickCount === 2 && doubleClickMode) {
-                    console.log('Double click launch');
-                    this.launchApp(app);
-                } else if (clickCount === 1 && doubleClickMode) {
-                    console.log('Single click select');
+                if (clickCount === 1) {
+                    // Single click - select the icon
+                    console.log('Single click - selecting icon');
                     this.selectIcon(icon);
+                } else if (clickCount === 2) {
+                    // Double click - launch the app
+                    console.log('Double click - launching app');
+                    this.launchApp(app);
                 }
                 clickCount = 0;
-            }, doubleClickMode ? 250 : 0);
+            }, 250); // 250ms window for double-click detection
         });
         
+        // Context menu
         icon.addEventListener('contextmenu', (e) => {
             e.preventDefault();
             this.showContextMenu(e, app);
         });
 
+        // Touch support
         let touchStartTime = 0;
+        let touchCount = 0;
+        let touchTimer = null;
+        
         icon.addEventListener('touchstart', (e) => {
             touchStartTime = Date.now();
+            touchCount++;
+            
+            if (touchTimer) {
+                clearTimeout(touchTimer);
+            }
+            
+            touchTimer = setTimeout(() => {
+                touchCount = 0;
+            }, 300);
         });
 
         icon.addEventListener('touchend', (e) => {
             const touchDuration = Date.now() - touchStartTime;
+            
             if (touchDuration < 500) {
                 e.preventDefault();
-                this.launchApp(app);
+                
+                if (touchCount === 1) {
+                    // Single tap - select
+                    this.selectIcon(icon);
+                } else if (touchCount >= 2) {
+                    // Double tap - launch
+                    this.launchApp(app);
+                    touchCount = 0;
+                }
             }
         });
-    },
-    
-    getFreshSettings() {
-        let freshSettings = {};
-        
-        if (window.DisplayManager && window.DisplayManager.getSettings) {
-            freshSettings = { ...window.DisplayManager.getSettings() };
-        }
-        
-        try {
-            const saved = localStorage.getItem('webos-desktop-settings');
-            if (saved) {
-                const parsed = JSON.parse(saved);
-                freshSettings.showLabels = parsed.showLabels;
-                freshSettings.doubleClickToOpen = parsed.doubleClickToOpen;
-            }
-        } catch (error) {
-            console.warn('Failed to read fresh settings from localStorage:', error);
-        }
-        
-        return { ...this.settings, ...freshSettings };
     },
     
     launchApp(app) {
@@ -319,11 +321,13 @@ window.DesktopIconManager = {
     },
     
     selectIcon(icon) {
+        // Deselect all other icons
         document.querySelectorAll('.desktop-icon').forEach(i => {
             i.classList.remove('selected');
             i.style.background = 'transparent';
         });
         
+        // Select this icon
         icon.classList.add('selected');
         icon.style.background = 'rgba(74, 144, 226, 0.3)';
         icon.style.backdropFilter = 'blur(10px)';
@@ -422,13 +426,14 @@ window.DesktopIconManager = {
     updateSettings(newSettings, options = {}) {
         console.log('DesktopIconManager.updateSettings called with:', newSettings);
         
+        // Only extract settings this manager cares about
         const behaviorSettings = {};
         if (newSettings.showLabels !== undefined) behaviorSettings.showLabels = newSettings.showLabels;
-        if (newSettings.doubleClickToOpen !== undefined) behaviorSettings.doubleClickToOpen = newSettings.doubleClickToOpen;
         
         this.settings = { ...this.settings, ...behaviorSettings };
         console.log('Updated DesktopIconManager internal settings:', this.settings);
         
+        // Pass display-specific settings to DisplayManager
         if (window.DisplayManager) {
             const displaySettings = {};
             ['iconSize', 'iconSpacing', 'layoutMode', 'columnsPerRow'].forEach(key => {
@@ -441,10 +446,6 @@ window.DesktopIconManager = {
                 console.log('Passing display settings to DisplayManager:', displaySettings);
                 window.DisplayManager.updateSettings(displaySettings);
             }
-        }
-        
-        if (behaviorSettings.doubleClickToOpen !== undefined) {
-            console.log('Double-click behavior changed, forcing complete icon refresh');
         }
         
         this.refreshIcons();
@@ -473,8 +474,7 @@ window.DesktopIconManager = {
             iconCount: this.iconContainer ? this.iconContainer.children.length : 0,
             containerExists: !!this.iconContainer,
             hiddenApps: Array.from(this.hiddenApps),
-            settings: this.getSettings(),
-            freshSettings: this.getFreshSettings()
+            settings: this.getSettings()
         };
     },
 
@@ -546,24 +546,25 @@ if (typeof window !== 'undefined') {
     if (window.Docs && window.Docs.initialized && typeof window.Docs.register === 'function') {
       window.Docs.register('desktop-icon-manager', {
         name: "DesktopIconManager",
-        version: "1.0.1",
-        description: "Manages the rendering, styling, and interaction logic for all icons displayed on the desktop surface. FIXED: Double-click behavior now works correctly.",
+        version: "2.0.0",
+        description: "Manages desktop icons with natural double-click/tap behavior. Single click selects, double-click launches - standard desktop interaction model.",
         type: "System Component",
         dependencies: ["AppRegistry", "DisplayManager", "EventBus", "DesktopSettingsApp"],
         features: [
-          "Renders icons based on AppRegistry and visibility status.",
-          "Handles click (single/double) and touch interaction with proper settings refresh.",
-          "Implements right-click context menu (Open, Hide).",
-          "Applies visual settings (size, spacing, labels) provided by DisplayManager/Settings.",
-          "Loads and applies persistent settings on initialization.",
-          "FIXED: Double-click setting now applies immediately without refresh."
+          "Natural double-click/tap to launch (standard desktop behavior)",
+          "Single click/tap to select icons",
+          "Right-click context menu (Open, Hide)",
+          "Touch-friendly with double-tap support",
+          "Visual settings (size, spacing, labels) via DisplayManager",
+          "Persistent settings storage"
         ],
         methods: [
-          { name: "init()", description: "Initializes the manager and loads initial settings." },
-          { name: "refreshIcons()", description: "Clears and re-renders all desktop icons with fresh event handlers." },
-          { name: "updateSettings(newSettings)", description: "Updates internal settings and triggers re-render/DisplayManager update." },
-          { name: "getFreshSettings()", description: "Gets current settings directly from localStorage and DisplayManager." },
-          { name: "hideApp(appId)", description: "Removes an app icon from the desktop." }
+          { name: "init()", description: "Initializes the manager and loads settings." },
+          { name: "refreshIcons()", description: "Re-renders all desktop icons." },
+          { name: "updateSettings(newSettings)", description: "Updates settings and triggers refresh." },
+          { name: "launchApp(app)", description: "Launches an application." },
+          { name: "selectIcon(icon)", description: "Selects an icon (single-click behavior)." },
+          { name: "hideApp(appId)", description: "Removes an app icon from desktop." }
         ],
         events: [
           "desktop-icons-ready", "desktop-settings-applied", "app-hidden", "app-shown"
