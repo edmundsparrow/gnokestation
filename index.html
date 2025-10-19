@@ -1,259 +1,42 @@
-<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="application-name" content="Gnoke Station">
-    <meta name="description" content="Gnoke Station - The Ultra-Lightweight Industrial Desktop Environment by edmundsparrow">
-    <meta name="author" content="Ekong Ikpe (edmundsparrow)">
-    <meta name="theme-color" content="#667eea">
-    <title>Gnoke Station</title>
-    <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
-    <link rel="icon" type="image/png" href="assets/favicon.png">
-    <style>
-        /* --- Styles for the Boot Screen --- */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-            color: white;
-            transition: opacity 0.5s ease-in-out; /* Fade-out effect */
-        }
-
-        body.fade-out { opacity: 0; }
-
-        .boot-container {
-            text-align: center;
-            max-width: 500px;
-            padding: 40px;
-            display: none; /* Hidden until boot starts */
-        }
-
-        body:not(.boot-completed) .boot-container { display: block; }
-
-        .system-name {
-            font-size: 2.5rem;
-            font-weight: 300;
-            margin-bottom: 10px;
-            opacity: 0;
-            animation: fadeInUp 1s ease-out 0.5s forwards;
-        }
-
-        .tagline {
-            font-size: 1.1rem;
-            opacity: 0;
-            margin-bottom: 40px;
-            animation: fadeInUp 1s ease-out 1s forwards;
-        }
-
-        .creator {
-            font-size: 0.9rem;
-            opacity: 0;
-            margin-bottom: 30px;
-            color: rgba(255, 255, 255, 0.8);
-            animation: fadeInUp 1s ease-out 1.3s forwards;
-        }
-
-        .boot-status {
-            margin-bottom: 30px;
-            opacity: 0;
-            animation: fadeInUp 1s ease-out 1.5s forwards;
-        }
-
-        .status-text {
-            font-size: 0.95rem;
-            margin-bottom: 20px;
-            height: 24px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .progress-container {
-            width: 300px;
-            height: 4px;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 2px;
-            margin: 0 auto;
-            overflow: hidden;
-        }
-
-        .progress-bar {
-            width: 0%;
-            height: 100%;
-            background: linear-gradient(90deg, #4CAF50, #81C784);
-            border-radius: 2px;
-            transition: width 0.3s ease;
-            animation: progressGlow 2s ease-in-out infinite;
-        }
-
-        .boot-steps {
-            margin-top: 30px;
-            opacity: 0;
-            animation: fadeInUp 1s ease-out 2s forwards;
-        }
-
-        .step {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 8px 0;
-            font-size: 0.85rem;
-            opacity: 0.6;
-        }
-
-        .step.active { opacity: 1; color: #81C784; }
-
-        .step-icon { margin-right: 8px; font-size: 1rem; }
-
-        @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        @keyframes progressGlow {
-            0%, 100% { box-shadow: 0 0 5px rgba(129, 199, 132, 0.5); }
-            50% { box-shadow: 0 0 20px rgba(129, 199, 132, 0.8); }
-        }
-    </style>
+    <title>Gnokestation</title>
+    <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-
-<!-- License Popup -->
-<div id="license-popup" style="
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.95);
-    color: white;
-    font-family: 'Segoe UI', sans-serif;
-    display: none;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    z-index: 99999;
-    padding: 20px;
-">
-    <div style="max-width: 500px;">
-        <h1>Notice</h1>
-        <p style="font-size:16px; line-height:1.5;">
-            This page is licensed under the 
-            <a href="/license" target="_blank" style="color:#76c7ff; text-decoration:underline;">GNU General Public License v3.0 (GPLv3)</a>.
-        </p>
-        <p style="margin-top:20px; font-size:14px;">
-            <label style="cursor:pointer;">
-                <input type="checkbox" id="accept-license" style="margin-right:8px;"> I have read and accept the license
-            </label>
-        </p>
-        <button id="continue-btn" disabled style="
-            margin-top:15px;
-            padding:8px 16px;
-            font-size:14px;
-            cursor:pointer;
-            border:none;
-            border-radius:6px;
-            background: linear-gradient(135deg, #3a6ea5, #764ba2);
-            color:white;
-        ">Continue</button>
+    <!-- Desktop Container -->
+    <div id="desktop">
+        <div id="windows-container"></div>
     </div>
-</div>
 
-<!-- Boot Screen -->
-<div class="boot-container">
-    <h1 class="system-name">Gnoke Station</h1>
-    <p class="tagline">The Ultra-Lightweight Industrial Desktop Environment</p>
-    <p class="creator">A WebDesktop by edmundsparrow</p>
+    <!-- Taskbar -->
+    <div id="taskbar">
+        <button class="start-button" id="start-btn">
+            <span>⊞</span> Start
+        </button>
+        <div class="taskbar-items" id="taskbar-items"></div>
+        <div class="clock" id="clock">--:--</div>
+    </div>
+
+    <!-- Core System (Load Order Critical) -->
+    <script src="core/event-bus.js"></script>
+    <script src="core/window-manager.js"></script>
+    <script src="core/app-registry.js"></script>
+    <script src="core/display.js"></script>
+    <script src="core/desktop.js"></script>
+    <script src="core/taskbar.js"></script>
+    <script src="core/main.js"></script>
     
-    <div class="boot-status">
-        <div class="status-text" id="statusText">Initializing system...</div>
-        <div class="progress-container">
-            <div class="progress-bar" id="progressBar"></div>
-        </div>
-    </div>
-    
-    <div class="boot-steps">
-        <div class="step" id="step1"><span class="step-icon">⚡</span><span>Loading core services</span></div>
-        <div class="step" id="step2"><span class="step-icon">🖥️</span><span>Initializing Gnoke Station desktop</span></div>
-        <div class="step" id="step3"><span class="step-icon">📦</span><span>Loading applications</span></div>
-        <div class="step" id="step4"><span class="step-icon">🎨</span><span>Preparing user interface</span></div>
-        <div class="step" id="step5"><span class="step-icon">✅</span><span>Ready to launch</span></div>
-    </div>
-</div>
+        <!-- User app loader (loads user apps) -->
+    <script src="core/apps/app-loader.js"></script>
+    <script src="core/desktop-icons.js"></script>
+    <script src="core/start-menu.js"></script>
+    <script src="core/apps/programs.js"></script>
+    <script src="core/apps/theme-manager.js"></script>
+    <script src="core/apps/theme.js"></script>
+    <script src="core/apps/app-manager.js"></script>
 
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const popup = document.getElementById('license-popup');
-    const checkbox = document.getElementById('accept-license');
-    const continueBtn = document.getElementById('continue-btn');
-    const bootContainer = document.querySelector('.boot-container');
-
-    checkbox.addEventListener('change', () => {
-        continueBtn.disabled = !checkbox.checked;
-    });
-
-    continueBtn.addEventListener('click', () => {
-        popup.style.display = 'none';
-        document.body.classList.add('fade-out');
-        setTimeout(() => { window.location.href = "main.html"; }, 500);
-    });
-
-    const bootSteps = [
-        { text: "Initializing system...", duration: 1000, progress: 15 },
-        { text: "Loading core services...", duration: 800, progress: 30 },
-        { text: "Starting Gnoke Station desktop...", duration: 1200, progress: 50 },
-        { text: "Loading applications...", duration: 1000, progress: 70 },
-        { text: "Preparing user interface...", duration: 800, progress: 85 },
-        { text: "Almost ready...", duration: 600, progress: 95 },
-        { text: "Boot sequence complete. User Notice pending...", duration: 1000, progress: 100 }
-    ];
-
-    let currentStep = 0;
-    const statusText = document.getElementById('statusText');
-    const progressBar = document.getElementById('progressBar');
-
-    function runBootSequence() {
-        if (currentStep >= bootSteps.length) {
-            bootContainer.style.display = 'none';
-            document.body.classList.add('boot-completed'); 
-            popup.style.display = 'flex';
-            return;
-        }
-        const step = bootSteps[currentStep];
-        statusText.textContent = step.text;
-        progressBar.style.width = step.progress + '%';
-        const stepEl = document.getElementById(`step${currentStep + 1}`);
-        if (stepEl) stepEl.classList.add('active');
-        currentStep++;
-        setTimeout(runBootSequence, step.duration);
-    }
-
-    window.addEventListener('load', () => {
-        setTimeout(runBootSequence, 2000);
-    });
-
-    document.addEventListener('click', () => {
-        if (currentStep < bootSteps.length) {
-            currentStep = bootSteps.length - 1;
-            statusText.textContent = "Fast boot enabled, showing notice...";
-            progressBar.style.width = '100%';
-            for (let i = 1; i <= 5; i++) {
-                const stepEl = document.getElementById(`step${i}`);
-                if (stepEl) stepEl.classList.add('active');
-            }
-            setTimeout(runBootSequence, 500); 
-        }
-    });
-});
-</script>
 </body>
 </html>
-    
