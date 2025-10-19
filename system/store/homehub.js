@@ -1433,7 +1433,7 @@
     if (window.AppRegistry) {
         // Define app configuration in a variable for reuse
         const appConfig = {
-            id: 'home-hub',
+            id: 'homehub',
             name: 'Smart Home',
             icon: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 48 48'><path d='M24 4L6 18v26h12V32h12v12h12V18L24 4z' fill='%231abc9c'/><path d='M24 4L42 18v4L24 8L6 22v-4L24 4z' fill='%2316a085'/><circle cx='16' cy='28' r='2' fill='%23f1c40f'/><circle cx='32' cy='28' r='2' fill='%23e74c3c'/><rect x='20' y='36' width='8' height='8' fill='%23ecf0f1'/></svg>",
             handler: () => window.HomeHubApp.open(),
