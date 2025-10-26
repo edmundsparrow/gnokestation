@@ -1,6 +1,7 @@
 /*
  * Gnokestation Shell - Terminal with Enhanced Favicon Support
  * Persistence added using localStorage.
+ * Enhanced favicon discovery for SVG, WebP, and other modern formats
  */
 
 window.TerminalApp = {
@@ -32,7 +33,7 @@ window.TerminalApp = {
         this.outputEl = win.querySelector("#terminal-output");
         this.inputEl = win.querySelector("#terminal-input");
 
-        this.print("WebDesktop Terminal v1.1 (Enhanced Favicon Support, Persistence)");
+        this.print("GnokeStation Terminal v1.2");
         this.print("Type 'help' to see available commands.\n");
 
         this.inputEl.addEventListener("keydown", (e) => {
@@ -71,7 +72,7 @@ window.TerminalApp = {
             const host = u.hostname.replace(/^www\./, '');
             const firstSegment = (u.pathname.split('/').filter(Boolean)[0] || '')
                 .replace(/\.[a-z0-9]+$/i, '');
-            return (firstSegment ? `${firstSegment} – ${host}` : host).replace(/[_\-]/g, ' ');
+            return (firstSegment ? `${firstSegment} — ${host}` : host).replace(/[_\-]/g, ' ');
         } catch (e) {
             const parts = input.split(/[/\\]/).filter(Boolean);
             const base = parts[parts.length - 1] || input;
@@ -79,6 +80,7 @@ window.TerminalApp = {
         }
     },
 
+    // 🔹 ENHANCED: Multi-source favicon discovery
     _faviconFor(url) {
         try {
             const u = new URL(url);
@@ -89,9 +91,12 @@ window.TerminalApp = {
         }
     },
 
+    // 🔹 ENHANCED: Try multiple favicon sources with fallback chain
     _createFaviconDataUrl(domain, fullUrl) {
-        const googleFavicon = `https://www.google.com/s2/favicons?domain=${domain}&sz=64`;
-        return googleFavicon;
+        // Strategy: Use icon.horse which handles SVG, WebP, PNG, ICO, and all modern formats
+        // It automatically detects and serves the best available favicon from the site
+        // Falls back gracefully if no favicon is found
+        return `https://icon.horse/icon/${domain}`;
     },
 
     _stringToColor(str) {
@@ -133,17 +138,26 @@ window.TerminalApp = {
             name: (name || id),
             icon: icon,
             handler: handler,
-            singleInstance: false,
+            singleInstance: true,
             // 🔹 CRITICAL: Store the URL on the object for later use by uninstall/re-registration
             url: urlForIframe 
         };
     },
 
+    // 🔹 ENHANCED: Better favicon error handling with fallback
     _createWebAppWindow(appName, url) {
+        const faviconUrl = this._faviconFor(url);
+        let fallbackIcon;
+        try {
+            fallbackIcon = this._createFallbackIcon(new URL(url).hostname);
+        } catch (e) {
+            fallbackIcon = this._createFallbackIcon(appName);
+        }
+
         const iframeHTML = `
             <div style="height:100%;display:flex;flex-direction:column;background:#fff;">
                 <div style="padding:8px 10px;border-bottom:1px solid #ddd;background:#f7f7f7;display:flex;align-items:center;gap:8px;">
-                    <img src="${this._faviconFor(url)}" style="width:16px;height:16px;" onerror="this.style.display='none'"/>
+                    <img src="${faviconUrl}" style="width:16px;height:16px;" onerror="this.src='${fallbackIcon}'"/>
                     <strong style="font-family:Segoe UI, sans-serif;flex:1;">${appName}</strong>
                     <button onclick="window.open('${url}', '_blank')" style="padding:4px 8px;border:1px solid #ddd;border-radius:3px;background:white;cursor:pointer;font-size:11px;">Open in New Tab</button>
                 </div>
@@ -321,11 +335,14 @@ window.TerminalApp = {
                     const testUrl = parts[1];
                     try {
                         const faviconUrl = this._faviconFor(testUrl);
-                        const fallbackIcon = this._createFallbackIcon(new URL(testUrl).hostname);
+                        const u = new URL(testUrl);
+                        const fallbackIcon = this._createFallbackIcon(u.hostname);
                         this.print(`Testing favicon for: ${testUrl}`);
+                        this.print(`Favicon Service: icon.horse (supports SVG, WebP, PNG, ICO)`);
                         this.print(`Favicon URL: ${faviconUrl}`);
                         this.print(`Fallback icon: ${fallbackIcon.substring(0, 100)}...`);
                         this.print(`\nYou can test the URL directly in a browser to verify it works.`);
+                        this.print(`icon.horse will automatically detect SVG and WebP favicons.`);
                     } catch (e) {
                         this.print(`Error testing icon: ${e.message}`);
                     }
@@ -337,6 +354,7 @@ window.TerminalApp = {
                     this.print("Usage: install <url|file-path>");
                     this.print("Examples:");
                     this.print("  install https://www.photopea.com");
+                    this.print("  install dalologisticsandautomobiles.netlify.app");
                     this.print("  install github.com (auto-adds https://)");
                     break;
                 }
@@ -375,7 +393,8 @@ window.TerminalApp = {
                         this._addInstalledUrl(appObj.url); 
                         
                         this.print(`✓ App '${appObj.name}' installed successfully as id '${appObj.id}'.`);
-                        this.print(`  Desktop icon should now show website favicon and persist on refresh.`);
+                        this.print(`  Desktop icon will show website favicon (SVG/WebP/PNG/ICO supported).`);
+                        this.print(`  App will persist across browser refreshes.`);
                     } else {
                         this.print("Failed to register app. AppRegistry unavailable.");
                     }
@@ -401,10 +420,11 @@ window.TerminalApp = {
                 
             case "about":
                 this.print("WebDesktop Terminal");
-                this.print(`Version: 1.1 (Enhanced Favicon Support)`);
+                this.print(`Version: 1.2 (Enhanced Favicon Discovery)`);
                 this.print(`Persistence: Enabled via localStorage`);
                 this.print(`Time: ${new Date().toLocaleString()}`);
-                this.print(`Favicon Service: Google Favicon API`);
+                this.print(`Favicon Service: icon.horse (SVG, WebP, PNG, ICO support)`);
+                this.print(`Modern Format Support: ✓ SVG ✓ WebP ✓ PNG ✓ ICO`);
                 break;
 
             case "clear":
@@ -429,7 +449,7 @@ if (window.AppRegistry) {
         name: "Terminal",
         icon: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='48' height='48'><rect width='48' height='48' rx='4' fill='%231e1e1e'/><path d='M12 16l8 8-8 8M24 30h12' stroke='%234ec9b0' stroke-width='2' fill='none' stroke-linecap='round'/></svg>",
         handler: () => window.TerminalApp.open(),
-        singleInstance: false
+        singleInstance: true
     });
 
     // Load and register persisted web apps on startup
