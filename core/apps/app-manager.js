@@ -14,7 +14,8 @@
       'about',
       'terminal',
       'store',
-      'Gnokestation-store'
+      'Gnokestation-store',
+      'gnokedrive',
     ]),
     
     // Apps from core/ folder that are part of the system
