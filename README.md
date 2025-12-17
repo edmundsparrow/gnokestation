@@ -1,8 +1,8 @@
 # Gnoke Station
 
 **Ultra-Lightweight Industrial Interface Platform**
-Complete desktop environment in just **700KB** – designed for industrial HMIs, controllers, and embedded systems.
-**Crucially, it is **mobile and tablet friendly by design**, built on standard web technologies to avoid the complexity and overhead often associated with traditional C++ or embedded interface solutions.
+Complete desktop environment in **~&lt;700KB** – designed for industrial HMIs, controllers, and embedded systems.
+**Crucially, it is mobile and tablet friendly by design**, built on standard web technologies to avoid the complexity and overhead often associated with traditional C++ or embedded interface solutions.
 
 *A WebDesktop by edmundsparrow*
 
@@ -10,11 +10,16 @@ Complete desktop environment in just **700KB** – designed for industrial HMIs,
 
 ## 🚀 Key Features
 
-* **700KB Total Size**: Core system + 25+ apps, no external dependencies.
-* **Runs on 512MB RAM**: No custom drivers required.
-* **Cross-Platform**: Works anywhere a browser runs (ARM, x86, mobile, embedded).
-* **Focus on Frontend UI**: Browser handles **all** rendering, networking, and security.
-* **Decoupled Architecture**: Requires **only** a lightweight **HAL Proxy** to bridge the browser to device APIs (for non-local apps).
+* **~&lt;700KB Total Size**: Core system + 25+ apps, no external dependencies.
+
+* **Direct Hardware Control**: Native support for **WebUSB, Web Serial, WebHID, Web Bluetooth, and Modbus RTU**—interact with hardware directly via modern browsers without a mandatory backend.
+
+* **Runs on 512MB RAM**: Ultra-efficient performance with ~30MB actual RAM usage.
+
+* **Cross-Platform**: Works anywhere a modern browser runs (ARM, x86, mobile, embedded).
+
+* **Hybrid Architecture**: Use direct browser APIs for local hardware or an optional lightweight **HAL Proxy** for legacy or remote systems.
+
 * **Fast Development**: Build apps with standard web technologies (HTML, CSS, JS).
 
 ---
@@ -27,46 +32,55 @@ Traditional embedded UI development is slow, costly, and hardware-specific. Gnok
 | :--- | :--- | :--- |
 | **Cost** | **$50K–$200K** | **$5K–$15K** (Frontend) |
 | **Timeline** | 6–18 months | **2–8 weeks** |
-| **Team** | Specialized embedded engineers | Existing web developers |
+| **Team** | Specialized embedded engineers |  System Architects & Frontend Devs |
 
-**Key Insight:** Gnoke Station provides the complete, professional frontend UI, allowing your team to focus only on the essential **Hardware Abstraction Layer (HAL)** backend logic.
+**Key Insight:** Gnoke Station provides a complete, professional frontend UI. Your team can now connect to hardware **directly via the browser** using modern Web APIs, or use a HAL backend only when strictly necessary.
 
 ---
 
 ## 🛠️ Applications Included
 
-* **Zero-Setup Apps (4)**: Calculator, Clock, Weather, News Feed (no backend needed).
-* **HAL-Required Controllers (3)**: WLED, GPIO, Samsung TV Remote (production-ready UI).
-* **Reference UIs (20+)**: Aquarium, Greenhouse, Smart Home Hub, Industrial Sensors (simulated for fast integration).
+* **Hardware &amp; System Tools**: Device Manager and integrated utilities for WebUSB, Web Serial, and Bluetooth communication.
+
+* **Zero-Setup Apps**: Calculator, Clock, Weather, News Feed.
+
+* **Reference UIs**: Aquarium, Greenhouse, Smart Home Hub, Industrial Sensors (designed for rapid UI prototyping).
+
 * **System Utilities**: App Store, Settings, Terminal.
 
 ---
 
 ## 🎮 Try It Out
 
-* **[Manufacturer Pitch:](https://gnokepitch.netlify.app)**
+* **[Manufacturer Pitch](https://gnokepitch.netlify.app)**
+
 * **[Live Demo](https://cutt.ly/XrM3CxqA)**
+
 * **[Source Code](https://github.com/edmundsparrow/gnokestation)**
 
 ---
 
 ## 📊 Performance
 
-* Boot Time: **< <5 second**
+* Boot Time: **&lt; 5 seconds**
+
 * RAM Usage: **~30MB**
-* 100% Browser Compatible
+
+* 100% Compatible with modern browsers (Chrome, Edge, Opera, etc.)
 
 ---
 
-## 📖 License & Support
+## 📖 License &amp; Support
 
-Gnoke Station is **100% Free & Open Source** under the **GPL-3.0 License**.
-Commercial consulting & integration support are available for your HAL implementation.
+Gnoke Station is **100% Free &amp; Open Source** under the **GPL-3.0 License**.
+Commercial consulting &amp; integration support are available for your hardware implementation.
 
 ---
 
 ## 📬 Contact
 
 Ekong Ikpe (edmundsparrow) • Gnoke Station
+
 * 📧 Email: [ekongmikpe@gmail.com](mailto:ekongmikpe@gmail.com)
+
 * 💬 WhatsApp: [Message](https://wa.me/2349024054758)
