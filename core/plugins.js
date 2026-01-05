@@ -11,13 +11,15 @@
   
   // List all plugin files here
   const PLUGINS = [
-    'deviceman.js',
+  'deviceman.js',
   'drivers.js',
-  'debug.js',
- // 'drivers/serial-monitor.js'
-    //'filesys.js',
-   // 'webusb.js',
-  //  'search.js'
+   //  'programs.js',
+   //  'store.js',
+  'gallery.js',
+  'gnokepad.js',
+  'gnokepdf.js',
+  'weather.js',
+  'installer.js',
     // Add new plugins here as you create them
   ];
 

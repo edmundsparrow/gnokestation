@@ -18,18 +18,17 @@
 
 /* ========================================
  * FILE: core/desktop-icons.js
- * VERSION: 2.0.0 (SIMPLIFIED - DOUBLE-CLICK DEFAULT)
+ * VERSION: 2.1.0 (REVERTED TO EXCLUSION LIST MODEL)
  * BUILD DATE: 2025-09-29
  *
  * PURPOSE:
  * Manages the display, styling, and user interaction for all desktop icons.
  * Uses natural double-click/tap behavior for launching apps.
  *
- * CHANGES FROM v1.0.1:
- * - Removed redundant doubleClickToOpen setting
- * - Double-click/tap is now the natural default behavior
- * - Single click selects the icon (standard desktop behavior)
- * - Cleaner, more intuitive interaction model
+ * CHANGES FROM v2.0.0:
+ * - REVERTED: Icon visibility is now controlled by the `hiddenApps` exclusion list.
+ * - FIX: `hideApp()` now correctly adds the app ID to `hiddenApps`.
+ * - ADDED: `showApp()` is the complementary function to restore a hidden icon.
  *
  * AUTHOR:
  * Edmundsparrow.netlify.app | whatsappme @ 09024054758 | webaplications5050@gmail.com
@@ -37,9 +36,10 @@
 
 window.DesktopIconManager = {
     iconContainer: null,
-    hiddenApps: new Set(),
-    systemApps: new Set(['about', 'desktop-settings']),
-    systemAppsNoDesktop: new Set(['startmenu', 'taskbar']), 
+    // EXCLUSION LIST (Original Model): Apps listed here will NOT be shown on the desktop.
+    hiddenApps: new Set(['about', 'debug', 'clock', 'calendar', 'weather']),
+    systemApps: new Set(['about', 'debug']),
+    systemAppsNoDesktop: new Set(['startmenu', 'app-manager', 'terminal', 'taskbar', 'deviceman', 'desktop-settings']), 
     settings: {
         showLabels: true,
         layoutMode: 'auto',
@@ -138,6 +138,7 @@ window.DesktopIconManager = {
         const apps = window.AppRegistry.getAllApps();
         
         apps.forEach(app => {
+            // ORIGINAL FILTERING LOGIC: Check if app is NOT in the exclusion list.
             if (!this.hiddenApps.has(app.id) && !this.systemAppsNoDesktop.has(app.id)) {
                 this.createDesktopIcon(app);
             }
@@ -405,6 +406,7 @@ window.DesktopIconManager = {
         return '📱';
     },
     
+    // FIX: Hides the app by ADDING it to the hiddenApps exclusion list.
     hideApp(appId) {
         this.hiddenApps.add(appId);
         this.refreshIcons();
@@ -414,6 +416,7 @@ window.DesktopIconManager = {
         }
     },
     
+    // ADDED: Complementary function to show the app by REMOVING it from the hiddenApps exclusion list.
     showApp(appId) {
         this.hiddenApps.delete(appId);
         this.refreshIcons();
@@ -546,8 +549,8 @@ if (typeof window !== 'undefined') {
     if (window.Docs && window.Docs.initialized && typeof window.Docs.register === 'function') {
       window.Docs.register('desktop-icon-manager', {
         name: "DesktopIconManager",
-        version: "2.0.0",
-        description: "Manages desktop icons with natural double-click/tap behavior. Single click selects, double-click launches - standard desktop interaction model.",
+        version: "2.1.0",
+        description: "Manages desktop icons with natural double-click/tap behavior. **Reverted to the `hiddenApps` exclusion list model.** The hide/show functions now dynamically update this list.",
         type: "System Component",
         dependencies: ["AppRegistry", "DisplayManager", "EventBus", "DesktopSettingsApp"],
         features: [
@@ -556,7 +559,8 @@ if (typeof window !== 'undefined') {
           "Right-click context menu (Open, Hide)",
           "Touch-friendly with double-tap support",
           "Visual settings (size, spacing, labels) via DisplayManager",
-          "Persistent settings storage"
+          "Persistent settings storage",
+          "Uses `hiddenApps` exclusion list for icon visibility"
         ],
         methods: [
           { name: "init()", description: "Initializes the manager and loads settings." },
@@ -564,7 +568,8 @@ if (typeof window !== 'undefined') {
           { name: "updateSettings(newSettings)", description: "Updates settings and triggers refresh." },
           { name: "launchApp(app)", description: "Launches an application." },
           { name: "selectIcon(icon)", description: "Selects an icon (single-click behavior)." },
-          { name: "hideApp(appId)", description: "Removes an app icon from desktop." }
+          { name: "hideApp(appId)", description: "Removes an app icon from desktop by adding it to the `hiddenApps` set." },
+          { name: "showApp(appId)", description: "Restores a hidden app by removing it from the `hiddenApps` set." }
         ],
         events: [
           "desktop-icons-ready", "desktop-settings-applied", "app-hidden", "app-shown"
