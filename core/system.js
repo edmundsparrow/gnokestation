@@ -19,8 +19,6 @@
   'clock.js',
   'debug.js',
   'docs.js',
-  'email.js',
-  'recommended.js',
   'terminal.js',
   ];
 
